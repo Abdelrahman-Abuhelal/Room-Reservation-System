@@ -21,7 +21,6 @@ public class Employee {
     @Column(name = "name")
     private String name;
     @Column(name = "email", unique = true)
-    @Email
     private String email;
     @Column(name = "password")
     private String password;

@@ -20,5 +20,6 @@ public class Room {
     private String name;
     @Column(name = "capacity")
     private Integer capacity;
+    private Boolean isReserved=false;
 
 }

@@ -1,7 +1,7 @@
 package com.example.roomreservation.controller;
 
 
-import com.example.roomreservation.model.Reservation;
+import com.example.roomreservation.model.reservation.Reservation;
 import com.example.roomreservation.service.ReservationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,9 +44,10 @@ public class ReservationController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReservation(@PathVariable Long id){
-        reservationService.deleteReservation(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    public ResponseEntity<String> deleteReservation(@PathVariable Long id){
+       Long deletedId =reservationService.deleteReservation(id);
+       String message="The reservation with the id "+deletedId+" is deleted";
+        return new ResponseEntity<>(message,HttpStatus.OK);
     }
 
 

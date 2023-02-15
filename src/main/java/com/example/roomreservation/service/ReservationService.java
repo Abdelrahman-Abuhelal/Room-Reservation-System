@@ -1,7 +1,7 @@
 package com.example.roomreservation.service;
 
 import com.example.roomreservation.exception.ReservationNotFoundException;
-import com.example.roomreservation.model.Reservation;
+import com.example.roomreservation.model.reservation.Reservation;
 import com.example.roomreservation.repository.ReservationRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;

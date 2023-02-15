@@ -1,7 +1,7 @@
 package com.example.roomreservation.repository;
 
 
-import com.example.roomreservation.model.Reservation;
+import com.example.roomreservation.model.reservation.Reservation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

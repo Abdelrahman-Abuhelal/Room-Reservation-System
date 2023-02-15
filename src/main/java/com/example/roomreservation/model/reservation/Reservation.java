@@ -1,5 +1,7 @@
-package com.example.roomreservation.model;
+package com.example.roomreservation.model.reservation;
 
+import com.example.roomreservation.model.room.Room;
+import com.example.roomreservation.model.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +9,6 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Table
@@ -26,7 +27,7 @@ public class Reservation {
     private Room room;
 
     @ManyToOne
-    private Employee owner;
+    private User owner;
 
     @Column(name = "start_time")
     private LocalDateTime startTime;

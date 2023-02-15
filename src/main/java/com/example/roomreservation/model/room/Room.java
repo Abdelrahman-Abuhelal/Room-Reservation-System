@@ -1,5 +1,6 @@
-package com.example.roomreservation.model;
+package com.example.roomreservation.model.room;
 
+import com.example.roomreservation.model.branch.Branch;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,8 +19,12 @@ public class Room {
     private Long id;
     @Column(name = "name")
     private String name;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "branch_id", nullable = false)
+    private Branch branch;
     @Column(name = "capacity")
     private Integer capacity;
+    @Column(name = "is_reserved")
     private Boolean isReserved=false;
 
 }

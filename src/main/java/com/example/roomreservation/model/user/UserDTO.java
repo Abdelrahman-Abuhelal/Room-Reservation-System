@@ -1,18 +1,16 @@
-package com.example.roomreservation.model;
+package com.example.roomreservation.model.user;
 
-import jakarta.persistence.Column;
 import lombok.*;
 
-import javax.validation.constraints.Email;
 @Getter
 @Setter
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class EmployeeDTO {
+public class UserDTO {
 
+    private Role role;
     private String name;
-    @Email
     private String email;
     private String password;
 }

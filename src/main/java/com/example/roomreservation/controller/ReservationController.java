@@ -2,6 +2,7 @@ package com.example.roomreservation.controller;
 
 
 import com.example.roomreservation.model.reservation.Reservation;
+import com.example.roomreservation.model.reservation.ReservationDTO;
 import com.example.roomreservation.service.ReservationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +33,7 @@ public class ReservationController {
     }
 
     @PostMapping
-    public ResponseEntity<Reservation> createReservation(@RequestBody Reservation reservation){
+    public ResponseEntity<Reservation> createReservation(@RequestBody ReservationDTO reservation){
         Reservation createdReservation= reservationService.createReservation(reservation);
         return new ResponseEntity<>(createdReservation, HttpStatus.CREATED);
     }

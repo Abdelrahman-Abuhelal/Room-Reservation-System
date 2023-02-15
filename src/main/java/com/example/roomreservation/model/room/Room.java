@@ -22,8 +22,10 @@ public class Room {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "branch_id", nullable = false)
     private Branch branch;
+
     @Column(name = "capacity")
     private Integer capacity;
+
     @Column(name = "is_reserved")
     private Boolean isReserved=false;
 

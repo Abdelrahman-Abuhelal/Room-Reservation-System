@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -23,14 +24,21 @@ public class RoomService {
         this.modelMapper = modelMapper;
     }
 
-    public Room getRoomById(Long id){
-        return roomRepository.findById(id).orElseThrow();
-    }
+
 
 
     public List<Room> getAllRooms(){
         List<Room>rooms= roomRepository.findAll();
         return rooms;
+    }
+
+    public Room getRoomById(Long id){
+        Optional<Room> room=roomRepository.findById(id);
+        if (!room.isPresent()){
+            String message=String.format("the room with the id %s  is not found",id);
+            throw new RoomNotFoundException(message);
+        }
+        return room.get();
     }
 
     public Room addRoom(Room room){

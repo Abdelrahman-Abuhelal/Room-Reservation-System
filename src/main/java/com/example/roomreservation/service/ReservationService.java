@@ -2,6 +2,8 @@ package com.example.roomreservation.service;
 
 import com.example.roomreservation.exception.ReservationNotFoundException;
 import com.example.roomreservation.model.reservation.Reservation;
+import com.example.roomreservation.model.reservation.ReservationDTO;
+import com.example.roomreservation.model.room.Room;
 import com.example.roomreservation.repository.ReservationRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -14,16 +16,26 @@ import java.util.List;
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
+
+    private final RoomService roomService;
     private final ModelMapper modelMapper;
 
 
-    public ReservationService(ReservationRepository reservationRepository, ModelMapper modelMapper) {
+    public ReservationService(ReservationRepository reservationRepository, RoomService roomService, ModelMapper modelMapper) {
         this.reservationRepository = reservationRepository;
+        this.roomService = roomService;
         this.modelMapper = modelMapper;
     }
 
-    public Reservation createReservation(Reservation reservation){
-       return reservationRepository.save(reservation);
+
+    public Reservation createReservation(ReservationDTO reservation){
+        Room reservedRoom=roomService.getRoomById(reservation.getRoomId());
+//        if (reservedRoom.getIsReserved()){
+//
+//        }
+        reservedRoom.setIsReserved(true);
+        Reservation reservation1=modelMapper.map(reservation,Reservation.class);
+        return reservationRepository.save(reservation1);
     }
     public List<Reservation> getAllReservations(){
         return reservationRepository.findAll();

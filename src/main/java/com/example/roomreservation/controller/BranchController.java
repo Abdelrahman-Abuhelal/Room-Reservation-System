@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -20,7 +21,7 @@ public class BranchController {
     }
 
     @PostMapping
-    public ResponseEntity<Branch> addBranch(@RequestBody Branch branch){
+    public ResponseEntity<Branch> addBranch(@RequestBody @Valid Branch branch){
         Branch addedBranch = branchService.addBranch(branch);
         return new ResponseEntity<>(addedBranch, HttpStatus.CREATED);
     }
@@ -28,13 +29,19 @@ public class BranchController {
     @GetMapping
     public ResponseEntity<List<Branch>> getAllBranches(){
        List<Branch> allBranches= branchService.getAllBranches();
-        return new ResponseEntity<>(allBranches, HttpStatus.CREATED);
+        return new ResponseEntity<>(allBranches, HttpStatus.OK);
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Branch> getBranchById(@PathVariable Long id){
         Branch selectedBranch= branchService.getBranchById(id);
-        return new ResponseEntity<>(selectedBranch, HttpStatus.CREATED);
+        return new ResponseEntity<>(selectedBranch, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteBranchById(@PathVariable Long id){
+        String message= branchService.deleteBranchById(id);
+        return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
 }

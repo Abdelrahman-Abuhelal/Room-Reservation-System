@@ -4,6 +4,8 @@ package com.example.roomreservation.controller;
 import com.example.roomreservation.model.reservation.Reservation;
 import com.example.roomreservation.model.reservation.ReservationDTO;
 import com.example.roomreservation.service.ReservationService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +18,7 @@ public class ReservationController {
 
     private final ReservationService reservationService;
 
+    @Autowired
     public ReservationController(ReservationService reservationService) {
         this.reservationService = reservationService;
     }
@@ -39,7 +42,7 @@ public class ReservationController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Reservation> updateReservation(@PathVariable Long id,@RequestBody Reservation reservation){
+    public ResponseEntity<Reservation> updateReservation(@PathVariable Long id,@RequestBody ReservationDTO reservation){
        Reservation updatedReservation= reservationService.updateReservation(id,reservation);
         return new ResponseEntity<>(updatedReservation, HttpStatus.OK);
     }

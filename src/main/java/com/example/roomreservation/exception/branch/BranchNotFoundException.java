@@ -1,4 +1,4 @@
-package com.example.roomreservation.exception;
+package com.example.roomreservation.exception.branch;
 
 public class BranchNotFoundException extends RuntimeException {
 

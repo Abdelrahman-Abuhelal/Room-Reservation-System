@@ -1,6 +1,6 @@
 package com.example.roomreservation.service;
 
-import com.example.roomreservation.exception.UserNotFoundException;
+import com.example.roomreservation.exception.user.UserNotFoundException;
 import com.example.roomreservation.model.user.User;
 import com.example.roomreservation.model.user.UserDTO;
 import com.example.roomreservation.repository.UserRepository;
@@ -44,7 +44,9 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public void deleteUser(Long id){
+    public String deleteUser(Long id){
+        String message = String.format("The user with the id %s is deleted",id);
         userRepository.deleteById(id);
+        return message;
     }
 }

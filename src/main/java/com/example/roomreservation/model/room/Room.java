@@ -19,7 +19,7 @@ public class Room {
     private Long id;
     @Column(name = "name")
     private String name;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "branch_id", nullable = false)
     private Branch branch;
 

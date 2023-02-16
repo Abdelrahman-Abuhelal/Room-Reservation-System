@@ -1,6 +1,8 @@
 package com.example.roomreservation.controller;
 
 import com.example.roomreservation.model.room.Room;
+import com.example.roomreservation.model.room.RoomDTO;
+import com.example.roomreservation.service.BranchService;
 import com.example.roomreservation.service.RoomService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +15,7 @@ import java.util.List;
 public class RoomController {
 
     private final RoomService roomService;
+
     public RoomController(RoomService roomService) {
         this.roomService = roomService;
     }
@@ -28,19 +31,18 @@ public class RoomController {
         return ResponseEntity.ok(room);
     }
     @PostMapping
-    public ResponseEntity<Room> addRoom(@RequestBody Room room){
+    public ResponseEntity<Room> addRoom(@RequestBody RoomDTO room){
         Room addedRoom = roomService.addRoom(room);
         return new ResponseEntity<>(addedRoom, HttpStatus.CREATED);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<Room> updateRoom(@RequestBody Room room,@PathVariable Long id){
+    public ResponseEntity<Room> updateRoom(@RequestBody RoomDTO room,@PathVariable Long id){
         Room updateRoom = roomService.updateRoom(room,id);
         return new ResponseEntity<>(updateRoom, HttpStatus.OK);
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteRoom(@PathVariable Long id){
-        Long deletedId = roomService.deleteRoom(id);
-        String message = "Room with the id "+deletedId+" is deleted";
+        String message = roomService.deleteRoom(id);
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 }

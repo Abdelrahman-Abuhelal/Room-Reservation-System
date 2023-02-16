@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 @Entity
@@ -21,8 +22,8 @@ public class Branch {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Enumerated(EnumType.STRING)
+    @NotBlank
     private BranchName name;
-    @OneToMany(mappedBy = "branch", cascade = CascadeType.ALL)
-    private List<Room> rooms;
+
 
 }

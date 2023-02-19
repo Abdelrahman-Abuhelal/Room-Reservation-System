@@ -5,12 +5,14 @@ import com.example.roomreservation.exception.branch.NoSuchBranchException;
 import com.example.roomreservation.model.branch.Branch;
 import com.example.roomreservation.model.branch.BranchName;
 import com.example.roomreservation.repository.BranchRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@Slf4j
 public class BranchService {
 
     private final BranchRepository branchRepository;
@@ -21,15 +23,20 @@ public class BranchService {
     }
 
     public Branch addBranch(Branch branch){
-        if (branch.getName()!= BranchName.BETHLEHEM && branch.getName()!=BranchName.NABLUS && branch.getName()!=BranchName.RAMALLAH){
-            String message="You Should Enter RAMALLAH ,BETHLEHEM or NABLUS";
-            throw new NoSuchBranchException(message);
+
+        if (branch.getName()== BranchName.BETHLEHEM || branch.getName()==BranchName.NABLUS || branch.getName()==BranchName.RAMALLAH){
+            return branchRepository.save(branch);
         }
-       return branchRepository.save(branch);
+        String message="You Should Enter RAMALLAH ,BETHLEHEM or NABLUS";
+        throw new NoSuchBranchException(message);
     }
 
     public List<Branch> getAllBranches(){
         return branchRepository.findAll();
+    }
+
+    public Branch getBranchByName(BranchName name){
+    return  branchRepository.findByName(name).orElseThrow(()->new BranchNotFoundException(String.format("Branch with the name %s isn't found",name)));
     }
 
     public Branch getBranchById(Long id){

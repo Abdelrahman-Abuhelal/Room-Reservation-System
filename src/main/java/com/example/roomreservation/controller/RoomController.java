@@ -1,5 +1,8 @@
 package com.example.roomreservation.controller;
 
+import com.example.roomreservation.model.branch.BranchName;
+import com.example.roomreservation.model.reservation.Reservation;
+import com.example.roomreservation.model.reservation.ReservationTime;
 import com.example.roomreservation.model.room.Room;
 import com.example.roomreservation.model.room.RoomDTO;
 import com.example.roomreservation.service.BranchService;
@@ -8,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -29,6 +33,19 @@ public class RoomController {
     public ResponseEntity<List<Room>> getAllRooms(){
         List<Room> room= roomService.getAllRooms();
         return ResponseEntity.ok(room);
+    }
+
+    @GetMapping("/available")
+    public ResponseEntity<List<Room>>getAllAvailableRooms(@RequestBody ReservationTime reservationTime){
+        List<Room> availableRooms=roomService.getAllAvailableRooms(reservationTime);
+        return ResponseEntity.ok(availableRooms);
+    }
+
+    @GetMapping("/{branchName}/available")
+    public ResponseEntity<List<Room>>getAllAvailableRooms(@RequestBody ReservationTime reservationTime,@PathVariable String branchName){
+        BranchName name=BranchName.valueOf(branchName.toUpperCase());
+        List<Room> availableRooms=roomService.getAllAvailableRoomsByBranchName(reservationTime,name);
+        return ResponseEntity.ok(availableRooms);
     }
     @PostMapping
     public ResponseEntity<Room> addRoom(@RequestBody RoomDTO room){

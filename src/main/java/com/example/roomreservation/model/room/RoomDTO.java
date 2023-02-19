@@ -15,7 +15,6 @@ public class RoomDTO {
     private Branch branch;
 
     private Integer capacity;
-    private Boolean isReserved;
 
 
 }

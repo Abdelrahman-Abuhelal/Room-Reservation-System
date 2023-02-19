@@ -2,7 +2,9 @@ package com.example.roomreservation.service;
 
 import com.example.roomreservation.exception.room.RoomNotFoundException;
 import com.example.roomreservation.model.branch.Branch;
+import com.example.roomreservation.model.branch.BranchName;
 import com.example.roomreservation.model.reservation.Reservation;
+import com.example.roomreservation.model.reservation.ReservationTime;
 import com.example.roomreservation.model.room.Room;
 import com.example.roomreservation.model.room.RoomDTO;
 import com.example.roomreservation.repository.RoomRepository;
@@ -40,6 +42,30 @@ public class RoomService {
     public List<Room> getAllRooms(){
         List<Room>rooms= roomRepository.findAll();
         return rooms;
+    }
+
+    public List<Room> getAllAvailableRooms(ReservationTime reservationTime){
+        LocalDateTime startTime=reservationTime.getStartTime();
+        LocalDateTime endTime=reservationTime.getEndTime();
+       List<Room> availableRooms= roomRepository.findAvailableRooms(startTime,endTime);
+       if (availableRooms.isEmpty()){
+           String message="There is no available rooms By this time";
+           log.info(message);
+       }
+       return availableRooms;
+    }
+
+    public List<Room> getAllAvailableRoomsByBranchName(ReservationTime reservationTime, BranchName branchName){
+        LocalDateTime startTime=reservationTime.getStartTime();
+        LocalDateTime endTime=reservationTime.getEndTime();
+        Branch branch =branchService.getBranchByName(branchName);
+        List<Room> availableRooms
+                = roomRepository.findAvailableRoomsByDateAndBranch(startTime,endTime,branch.getName());
+        if (availableRooms.isEmpty()){
+            String message="There is no available rooms By this time";
+            log.info(message);
+        }
+        return availableRooms;
     }
 
     public Room getRoomById(Long id){

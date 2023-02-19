@@ -15,4 +15,5 @@ public interface ReservationRepository extends JpaRepository<Reservation,Long> {
 
 
    Optional<List<Reservation>> findByRoomAndEndTimeAfterAndStartTimeBefore(Room room, LocalDateTime startTime, LocalDateTime endTime);
+
 }

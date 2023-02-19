@@ -55,6 +55,9 @@ public class ReservationService {
         Reservation reservation1=modelMapper.map(reservation,Reservation.class);
         return reservationRepository.save(reservation1);
     }
+
+
+
     public List<Reservation> getAllReservations(){
         return reservationRepository.findAll();
     }

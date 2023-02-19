@@ -42,7 +42,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     }
     @ExceptionHandler(NoSuchBranchException.class)
     public ResponseEntity<String> handleNoSuchBranchException(NoSuchBranchException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
     @ExceptionHandler(BranchNotFoundException.class)
     public ResponseEntity<String> handleBranchNotFoundException(BranchNotFoundException e) {

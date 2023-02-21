@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -56,6 +57,10 @@ public class UserService implements UserDetailsService {
         String message = String.format("The user with the id %s is deleted",id);
         userRepository.deleteById(id);
         return message;
+    }
+    public boolean findByUsername(String username) {
+        Optional<User> myuser = userRepository.findByUsername(username);
+        return myuser.isPresent();
     }
 
     @Override

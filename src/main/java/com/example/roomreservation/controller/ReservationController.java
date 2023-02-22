@@ -24,18 +24,21 @@ public class ReservationController {
         this.reservationService = reservationService;
     }
 
+    //getting all reservations
     @GetMapping
     public ResponseEntity<List<Reservation>> getAllReservations(){
         List<Reservation> reservationList= reservationService.getAllReservations();
         return new ResponseEntity<>(reservationList,HttpStatus.OK);
     }
 
+    //get a reservation by the id of the reservation
     @GetMapping({"/{id}"})
     public ResponseEntity<Reservation> getReservationById(@PathVariable Long id){
         Reservation reservationList= reservationService.getReservationById(id);
         return new ResponseEntity<>(reservationList,HttpStatus.OK);
     }
 
+    // reserve a room
     @PostMapping
     public ResponseEntity<Reservation> createReservation(@RequestBody ReservationDTO reservation){
         Reservation createdReservation= reservationService.createReservation(reservation);
@@ -43,13 +46,15 @@ public class ReservationController {
     }
 
 
-
+    // update one reservation with new data
     @PutMapping("/{id}")
     public ResponseEntity<Reservation> updateReservation(@PathVariable Long id,@RequestBody ReservationDTO reservation){
        Reservation updatedReservation= reservationService.updateReservation(id,reservation);
         return new ResponseEntity<>(updatedReservation, HttpStatus.OK);
     }
 
+
+    // delete a reservation by its id
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteReservation(@PathVariable Long id){
        Long deletedId =reservationService.deleteReservation(id);

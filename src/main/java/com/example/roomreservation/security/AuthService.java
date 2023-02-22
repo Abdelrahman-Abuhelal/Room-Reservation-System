@@ -43,6 +43,7 @@ public class AuthService {
 
     public JWTResponseDTO login(String username, String password) {
 //        log.info(login+"  "+ password);
+        log.debug("reached here");
         Authentication authentication = authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password));
 

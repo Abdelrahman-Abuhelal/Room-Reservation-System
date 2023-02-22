@@ -1,6 +1,7 @@
 package com.example.roomreservation.service;
 
 import com.example.roomreservation.exception.user.UserNotFoundException;
+import com.example.roomreservation.model.user.Role;
 import com.example.roomreservation.model.user.User;
 import com.example.roomreservation.model.user.UserDTO;
 import com.example.roomreservation.repository.UserRepository;
@@ -30,7 +31,11 @@ public class UserService implements UserDetailsService {
     }
 
     public List<User> getAllUsers(){
-        return userRepository.findAll();
+        return userRepository.findUsersByRole(Role.USER).orElseThrow( ()-> new UserNotFoundException("users are not found"));
+    }
+
+    public List<User> getAllAdmins(){
+        return userRepository.findUsersByRole(Role.ADMIN).orElseThrow( ()-> new UserNotFoundException("Admins are not found"));
     }
 
     public User createUser(UserDTO user){

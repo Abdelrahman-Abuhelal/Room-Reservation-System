@@ -19,31 +19,34 @@ public class UserController {
         this.userService = userService;
     }
 
+    //get all users NOT ADMIN
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers(){
         List<User> userList= userService.getAllUsers();
         return new ResponseEntity<>(userList, HttpStatus.OK);
     }
 
+    //get a user by its id
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id){
         User user= userService.getUserById(id);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
-
+    // create a new user
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody UserDTO user){
         User createdUser= userService.createUser(user);
         return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
     }
 
-
+    //update a user
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody UserDTO user){
         User updatedUser= userService.updateUser(id,user);
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 
+    //delete an existed user
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Long id){
         String message=userService.deleteUser(id);

@@ -47,13 +47,16 @@ public class SecurityConfig {
                 .and().authorizeHttpRequests().requestMatchers(PUBLIC_END_POINTS).permitAll()
                 .anyRequest().authenticated().and().addFilterBefore(authFilter(), UsernamePasswordAuthenticationFilter.class);
 
+
         return http.build();
     }
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers("/swagger-ui", "/v2/api-docs");
+        return (web) -> web.ignoring().requestMatchers("/swagger-ui/**", "/v2/api-docs/**");
     }
+
+
     @Bean
     public AuthFilter authFilter() {
         return new AuthFilter();

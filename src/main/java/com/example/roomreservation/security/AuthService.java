@@ -2,6 +2,7 @@ package com.example.roomreservation.security;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,14 +31,17 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
-import javax.naming.directory.Attribute;
-import javax.naming.directory.Attributes;
-import javax.naming.directory.DirContext;
+import javax.naming.Context;
+import javax.naming.NamingEnumeration;
+import javax.naming.directory.*;
+import javax.naming.ldap.InitialLdapContext;
+import javax.naming.ldap.LdapContext;
 
 @Service
 @Log4j2
 @RequiredArgsConstructor
 public class AuthService {
+    static Hashtable<String, String> env;
 
     private final AuthenticationManager authManager;
     private final HttpServletRequest httpRequest;
@@ -76,61 +80,92 @@ public class AuthService {
 //                .refreshToken(tokenInfo.getRefreshToken())
 //                .build();
 //    }
-    public String login(String username, String password) {
-
-        LdapContextSource contextSource = new LdapContextSource();
-        contextSource.setUrl("ldap://192.168.206.190:389");
-        contextSource.setBase("cn=administrator,cn=users,DC=lab,DC=local");
-        contextSource.setUserDn("lab\\administrator");
-        contextSource.setPassword("Cato@1234");
-        contextSource.setReferral("follow");
-        contextSource.afterPropertiesSet();
-        try {
-            contextSource.afterPropertiesSet();
-            DirContext dirContext = contextSource.getContext(contextSource.getUserDn(), contextSource.getPassword());
-            if (dirContext != null) {
-                log.info("Connection to Active Directory successful.");
-            }
-        } catch (Exception e) {
-            System.out.println("Connection to Active Directory failed: " + e.getMessage());
-        }
-        BindAuthenticator authenticator = new BindAuthenticator(contextSource);
-
-        authenticator.setUserSearch(new FilterBasedLdapUserSearch("dc=lab,dc=local", "sAMAccountName="+username, contextSource));
-        Authentication authentication = null;
-        try {
-            authentication = (Authentication) authenticator.authenticate(new UsernamePasswordAuthenticationToken(username,password));
-        } catch (BadCredentialsException e) {
-        }
-
-        if (authentication != null) {
-            String userFullName = "";
-            AttributesMapper<String> attributesMapper = new AttributesMapper<String>() {
-                @Override
-                public String mapFromAttributes(Attributes attributes) throws NamingException, javax.naming.NamingException {
-                    Attribute cnAttr = attributes.get("cn");
-                    if (cnAttr != null) {
-                        return (String) cnAttr.get();
-                    } else {
-                        return null;
-                    }
-                }
-            };
-            LdapTemplate ldapTemplate = new LdapTemplate(contextSource);
-            ldapTemplate.setIgnorePartialResultException(true);
-            List<String> userFullNames = ldapTemplate.search("dc=lab,dc=local", "(sAMAccountName=" + username + ")", attributesMapper);
-            if (!userFullNames.isEmpty()) {
-                userFullName = userFullNames.get(0);
-            }
-
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-
-//            TokenInfo tokenInfo = createLoginToken(username, userFullName);
-
-            return userFullName;
+private static String getUserInfo(String userName, LdapContext ctx, SearchControls searchControls) {
+    System.out.println("*** " + userName + " ***");
+    User user = null;
+    try {
+        NamingEnumeration<SearchResult> answer = ctx.search("dc=lab,dc=local", "sAMAccountName=" + userName, searchControls);
+        if (answer.hasMore()) {
+            Attributes attrs = answer.next().getAttributes();
+            return String.valueOf(attrs.get("distinguishedName")).split(":")[1];
         } else {
-            throw new BadCredentialsException("Authentication failed");
+            System.out.println("user not found.");
         }
+    } catch (Exception ex) {
+        ex.printStackTrace();
+    }
+    return  "";
+}
+
+    private static LdapContext getLdapContext() {
+        LdapContext ctx = null;
+        try {
+            env = new Hashtable<String, String>();
+
+            env.put(Context.INITIAL_CONTEXT_FACTORY,
+                    "com.sun.jndi.ldap.LdapCtxFactory");
+            env.put(Context.PROVIDER_URL, "ldap://192.168.206.190:389");
+            // Authenticate as S. User and password "mysecret"
+            env.put(Context.SECURITY_AUTHENTICATION, "simple");
+            env.put(Context.SECURITY_PRINCIPAL, "CN=Administrator,CN=users,DC=lab,DC=local");
+            env.put(Context.SECURITY_CREDENTIALS, "Cato@1234");
+            env.put(Context.REFERRAL, "follow");
+
+            ctx = new InitialLdapContext(env, null);
+            System.out.println("LDAP Connection: COMPLETE");
+        } catch (NamingException | javax.naming.NamingException nex) {
+            System.out.println("LDAP Connection: FAILED");
+            nex.printStackTrace();
+        }
+        return ctx;
+    }
+
+    private static SearchControls getSearchControls() {
+        SearchControls cons = new SearchControls();
+        cons.setSearchScope(SearchControls.SUBTREE_SCOPE);
+        String[] attrIDs = {"distinguishedName", "sn", "givenname", "mail", "telephonenumber", "thumbnailPhoto"};
+        cons.setReturningAttributes(attrIDs);
+        return cons;
+    }
+    public String login(String username, String password) throws javax.naming.NamingException {
+        LdapContext ldapContext = getLdapContext();
+
+        SearchControls searchControls = getSearchControls();
+        String distinguishedName = getUserInfo(username, ldapContext, searchControls);
+        env.put(Context.SECURITY_PRINCIPAL, distinguishedName);
+        env.put(Context.SECURITY_CREDENTIALS,password);
+
+        DirContext userContext = new InitialDirContext(env);
+
+
+//        if (authentication != null) {
+//            String userFullName = "";
+//            AttributesMapper<String> attributesMapper = new AttributesMapper<String>() {
+//                @Override
+//                public String mapFromAttributes(Attributes attributes) throws NamingException, javax.naming.NamingException {
+//                    Attribute cnAttr = attributes.get("cn");
+//                    if (cnAttr != null) {
+//                        return (String) cnAttr.get();
+//                    } else {
+//                        return null;
+//                    }
+//                }
+//            };
+//            LdapTemplate ldapTemplate = new LdapTemplate(contextSource);
+//            ldapTemplate.setIgnorePartialResultException(true);
+//            List<String> userFullNames = ldapTemplate.search("dc=lab,dc=local", "(sAMAccountName=" + username + ")", attributesMapper);
+//            if (!userFullNames.isEmpty()) {
+//                userFullName = userFullNames.get(0);
+//            }
+//
+//            SecurityContextHolder.getContext().setAuthentication(authentication);
+//
+////            TokenInfo tokenInfo = createLoginToken(username, userFullName);
+//
+//            return userFullName;
+//        } else {
+//            throw new BadCredentialsException("Authentication failed");
+//        }
 //        com.example.roomreservation.model.user.User userDetails = (User) authentication.getPrincipal();
 //
 //        // Update the security context
@@ -140,6 +175,7 @@ public class AuthService {
 //        TokenInfo tokenInfo = createLoginToken(username, userDetails.getId());
 
         // Return JWTResponseDTO
+        return "ads";
     }
 
 

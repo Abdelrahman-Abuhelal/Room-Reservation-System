@@ -16,35 +16,35 @@ public class AppConfig {
         return new ModelMapper();
     }
 
-    @Bean
-    public AuthenticationProvider activeDirectoryLdapAuthenticationProvider(){
+//    @Bean
+//    public AuthenticationProvider activeDirectoryLdapAuthenticationProvider(){
+//
+//        ActiveDirectoryLdapAuthenticationProvider activeDirectoryLdapAuthenticationProvider = new ActiveDirectoryLdapAuthenticationProvider(
+//                "lab.local","ldap://192.168.206.190");
+//
+//// to parse AD failed credentials error message due to account - expiry,lock, credentials - expiry,lock
+//        activeDirectoryLdapAuthenticationProvider.setConvertSubErrorCodesToExceptions(true);
+//        return activeDirectoryLdapAuthenticationProvider;
+//    }
 
-        ActiveDirectoryLdapAuthenticationProvider activeDirectoryLdapAuthenticationProvider = new ActiveDirectoryLdapAuthenticationProvider(
-                "lab.local","ldap://192.168.206.190");
+//    @Bean
+//    public LdapTemplate ldapTemplate() {
+//        LdapTemplate ldapTemplate = new LdapTemplate();
+//        ldapTemplate.setContextSource(getContextSource());
+//        ldapTemplate.setIgnorePartialResultException(true);
+//        return ldapTemplate;
+//    }
 
-// to parse AD failed credentials error message due to account - expiry,lock, credentials - expiry,lock
-        activeDirectoryLdapAuthenticationProvider.setConvertSubErrorCodesToExceptions(true);
-        return activeDirectoryLdapAuthenticationProvider;
-    }
-
-    @Bean
-    public LdapTemplate ldapTemplate() {
-        LdapTemplate ldapTemplate = new LdapTemplate();
-        ldapTemplate.setContextSource(getContextSource());
-        ldapTemplate.setIgnorePartialResultException(true);
-        return ldapTemplate;
-    }
-
-    @Bean
-    public LdapContextSource getContextSource() {
-        LdapContextSource contextSource = new LdapContextSource();
-        contextSource.setUrl("ldap://192.168.206.190:389");
-        contextSource.setBase("DC=lab,DC=local");
-        contextSource.setUserDn("administrator@lab.local");
-        contextSource.setPassword("Cato@1234");
-        contextSource.afterPropertiesSet();
-        return contextSource;
-    }
+//    @Bean
+//    public LdapContextSource getContextSource() {
+//        LdapContextSource contextSource = new LdapContextSource();
+//        contextSource.setUrl("ldap://192.168.206.190:389");
+//        contextSource.setBase("DC=lab,DC=local");
+//        contextSource.setUserDn("administrator@lab.local");
+//        contextSource.setPassword("Cato@1234");
+//        contextSource.afterPropertiesSet();
+//        return contextSource;
+//    }
 
 
 

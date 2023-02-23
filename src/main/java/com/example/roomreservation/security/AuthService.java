@@ -2,6 +2,7 @@ package com.example.roomreservation.security;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -11,16 +12,28 @@ import com.example.roomreservation.service.TokenInfoService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.ldap.NamingException;
+import org.springframework.ldap.core.AttributesMapper;
+import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.ldap.authentication.BindAuthenticator;
+import org.springframework.security.ldap.search.FilterBasedLdapUserSearch;
 import org.springframework.stereotype.Service;
 
 
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.DirContext;
+
 @Service
 @Log4j2
 @RequiredArgsConstructor
@@ -41,28 +54,94 @@ public class AuthService {
         this.httpRequest = httpRequest;
     }
 
-    public JWTResponseDTO login(String username, String password) {
-//        log.info(login+"  "+ password);
-        log.debug("reached here");
-        Authentication authentication = authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(username, password));
+//    public JWTResponseDTO login(String username, String password) {
+////        log.info(login+"  "+ password);
+//        log.debug("reached here");
+//        Authentication authentication = authManager.authenticate(
+//                new UsernamePasswordAuthenticationToken(username, password));
+//
+//        log.debug("Valid userDetails credentials.");
+//
+//        com.example.roomreservation.model.user.User userDetails = (User) authentication.getPrincipal();
+//
+//        SecurityContextHolder.getContext().setAuthentication(authentication);
+//        log.debug("SecurityContextHolder updated. [login={}]", username);
+//
+//
+//        TokenInfo tokenInfo = createLoginToken(username, userDetails.getId());
+//
+//
+//        return JWTResponseDTO.builder()
+//                .accessToken(tokenInfo.getAccessToken())
+//                .refreshToken(tokenInfo.getRefreshToken())
+//                .build();
+//    }
+    public String login(String username, String password) {
 
-        log.debug("Valid userDetails credentials.");
+        LdapContextSource contextSource = new LdapContextSource();
+        contextSource.setUrl("ldap://192.168.206.190:389");
+        contextSource.setBase("cn=administrator,cn=users,DC=lab,DC=local");
+        contextSource.setUserDn("lab\\administrator");
+        contextSource.setPassword("Cato@1234");
+        contextSource.setReferral("follow");
+        contextSource.afterPropertiesSet();
+        try {
+            contextSource.afterPropertiesSet();
+            DirContext dirContext = contextSource.getContext(contextSource.getUserDn(), contextSource.getPassword());
+            if (dirContext != null) {
+                log.info("Connection to Active Directory successful.");
+            }
+        } catch (Exception e) {
+            System.out.println("Connection to Active Directory failed: " + e.getMessage());
+        }
+        BindAuthenticator authenticator = new BindAuthenticator(contextSource);
 
-        com.example.roomreservation.model.user.User userDetails = (User) authentication.getPrincipal();
+        authenticator.setUserSearch(new FilterBasedLdapUserSearch("dc=lab,dc=local", "sAMAccountName="+username, contextSource));
+        Authentication authentication = null;
+        try {
+            authentication = (Authentication) authenticator.authenticate(new UsernamePasswordAuthenticationToken(username,password));
+        } catch (BadCredentialsException e) {
+        }
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        log.debug("SecurityContextHolder updated. [login={}]", username);
+        if (authentication != null) {
+            String userFullName = "";
+            AttributesMapper<String> attributesMapper = new AttributesMapper<String>() {
+                @Override
+                public String mapFromAttributes(Attributes attributes) throws NamingException, javax.naming.NamingException {
+                    Attribute cnAttr = attributes.get("cn");
+                    if (cnAttr != null) {
+                        return (String) cnAttr.get();
+                    } else {
+                        return null;
+                    }
+                }
+            };
+            LdapTemplate ldapTemplate = new LdapTemplate(contextSource);
+            ldapTemplate.setIgnorePartialResultException(true);
+            List<String> userFullNames = ldapTemplate.search("dc=lab,dc=local", "(sAMAccountName=" + username + ")", attributesMapper);
+            if (!userFullNames.isEmpty()) {
+                userFullName = userFullNames.get(0);
+            }
 
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        TokenInfo tokenInfo = createLoginToken(username, userDetails.getId());
+//            TokenInfo tokenInfo = createLoginToken(username, userFullName);
 
+            return userFullName;
+        } else {
+            throw new BadCredentialsException("Authentication failed");
+        }
+//        com.example.roomreservation.model.user.User userDetails = (User) authentication.getPrincipal();
+//
+//        // Update the security context
+//        SecurityContextHolder.getContext().setAuthentication(authentication);
+//
+//        // Create login token
+//        TokenInfo tokenInfo = createLoginToken(username, userDetails.getId());
 
-        return JWTResponseDTO.builder()
-                .accessToken(tokenInfo.getAccessToken())
-                .refreshToken(tokenInfo.getRefreshToken())
-                .build();
+        // Return JWTResponseDTO
     }
+
 
 
     public TokenInfo createLoginToken(String username, Long userId) {

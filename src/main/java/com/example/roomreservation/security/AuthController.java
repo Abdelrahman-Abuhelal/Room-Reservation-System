@@ -19,7 +19,7 @@ public class AuthController {
 
     private final AuthService authService;
     private final AuthenticationManager authenticationManager;
-    private final LDAPServiceImpl ldapService;
+//    private final LDAPServiceImpl ldapService;
 
 
     @PostMapping("/login")

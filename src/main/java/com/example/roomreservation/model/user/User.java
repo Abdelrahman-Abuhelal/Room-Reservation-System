@@ -33,7 +33,7 @@ public class User implements UserDetails {
     @Size(max = 50)
     private String username;
 
-    @Column(name = "email", unique = true)
+    @Column(name = "email")
     @NotBlank
     @Size(max = 50)
     private String email;

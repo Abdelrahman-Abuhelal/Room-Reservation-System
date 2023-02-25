@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.example.roomreservation.exception.user.UserNotFoundException;
 import com.example.roomreservation.model.token.TokenInfo;
 import com.example.roomreservation.model.user.User;
 import com.example.roomreservation.service.TokenInfoService;
@@ -89,7 +90,9 @@ private static String getUserInfo(String userName, LdapContext ctx, SearchContro
             Attributes attrs = answer.next().getAttributes();
             return String.valueOf(attrs.get("distinguishedName")).split(":")[1];
         } else {
-            System.out.println("user not found.");
+            String message="The user is not found";
+            log.info(message);
+           throw new UserNotFoundException(message);
         }
     } catch (Exception ex) {
         ex.printStackTrace();
@@ -134,8 +137,9 @@ private static String getUserInfo(String userName, LdapContext ctx, SearchContro
         String distinguishedName = getUserInfo(username, ldapContext, searchControls);
         env.put(Context.SECURITY_PRINCIPAL, distinguishedName);
         env.put(Context.SECURITY_CREDENTIALS,password);
-
         DirContext userContext = new InitialDirContext(env);
+        Attributes attributes=userContext.getAttributes(distinguishedName);
+
 
 
 //        if (authentication != null) {

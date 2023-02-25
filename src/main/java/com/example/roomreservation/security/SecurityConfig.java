@@ -40,20 +40,24 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf().disable()
-                .authorizeHttpRequests()
-                .and().exceptionHandling().and()
-                .httpBasic().authenticationEntryPoint(jwtUnAuthResponse).and().sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and().authorizeHttpRequests().requestMatchers(PUBLIC_END_POINTS).permitAll()
-                .anyRequest().authenticated().and().addFilterBefore(authFilter(), UsernamePasswordAuthenticationFilter.class);
-
+                .authorizeHttpRequests().requestMatchers("/api/v1/auth/login", "/api/v1/auth/refresh-token", "/api/v1/auth/logout","/api/v1/users/**").permitAll()
+                .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/webjars/**", "/v3/api-docs/**").permitAll()
+                .anyRequest().authenticated()
+                .and().exceptionHandling().authenticationEntryPoint(jwtUnAuthResponse)
+                .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+               .and().addFilterBefore(authFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers("/swagger-ui/**", "/v2/api-docs/**");
+        return (web) -> web.ignoring().requestMatchers("/api/auth/**","/v2/api-docs",
+                "/configuration/ui",
+                "/swagger-resources",
+                "/configuration/security",
+                "/swagger-ui.html",
+                "/webjars/**");
     }
 
 

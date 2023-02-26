@@ -23,14 +23,14 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    public String login (@RequestBody LoginRequestDTO loginRequest) throws Exception {
-        String jwtResponseDto;
+    public ResponseEntity<JWTResponseDTO>  login (@RequestBody LoginRequestDTO loginRequest) throws Exception {
+        JWTResponseDTO jwtResponseDto;
     try{
          jwtResponseDto = authService.login(loginRequest.getUsername(), loginRequest.getPassword());
         log.debug("success");
     }catch (BadCredentialsException e) {
         throw new Exception("Incorrect username or password", e);
     }
-        return jwtResponseDto;
+        return ResponseEntity.ok(jwtResponseDto);
     }
 }

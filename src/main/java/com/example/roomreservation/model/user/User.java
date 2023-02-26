@@ -50,6 +50,9 @@ public class User implements UserDetails {
     public User(Long id) {
         this.id = id;
     }
+    public User(String username,String email) {
+        this.username = username;
+    }
 
     public User(String username, String password, Role role) {
         this.username = username;

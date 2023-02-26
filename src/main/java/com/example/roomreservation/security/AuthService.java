@@ -130,61 +130,31 @@ private static String getUserInfo(String userName, LdapContext ctx, SearchContro
         cons.setReturningAttributes(attrIDs);
         return cons;
     }
-    public String login(String username, String password) throws javax.naming.NamingException {
+    public JWTResponseDTO login(String userName, String password) throws javax.naming.NamingException {
         LdapContext ldapContext = getLdapContext();
 
         SearchControls searchControls = getSearchControls();
-        String distinguishedName = getUserInfo(username, ldapContext, searchControls);
+        String distinguishedName = getUserInfo(userName, ldapContext, searchControls);
         env.put(Context.SECURITY_PRINCIPAL, distinguishedName);
         env.put(Context.SECURITY_CREDENTIALS,password);
         DirContext userContext = new InitialDirContext(env);
-        Attributes attributes=userContext.getAttributes(distinguishedName);
+        Attributes userAttributes = userContext.getAttributes(distinguishedName);
+        String username = userAttributes.get("sAMAccountName").get().toString();
+        String email = userAttributes.get("mail").get().toString();
+        TokenInfo tokenInfo = createLoginToken(username, email);
 
-
-
-//        if (authentication != null) {
-//            String userFullName = "";
-//            AttributesMapper<String> attributesMapper = new AttributesMapper<String>() {
-//                @Override
-//                public String mapFromAttributes(Attributes attributes) throws NamingException, javax.naming.NamingException {
-//                    Attribute cnAttr = attributes.get("cn");
-//                    if (cnAttr != null) {
-//                        return (String) cnAttr.get();
-//                    } else {
-//                        return null;
-//                    }
-//                }
-//            };
-//            LdapTemplate ldapTemplate = new LdapTemplate(contextSource);
-//            ldapTemplate.setIgnorePartialResultException(true);
-//            List<String> userFullNames = ldapTemplate.search("dc=lab,dc=local", "(sAMAccountName=" + username + ")", attributesMapper);
-//            if (!userFullNames.isEmpty()) {
-//                userFullName = userFullNames.get(0);
-//            }
-//
-//            SecurityContextHolder.getContext().setAuthentication(authentication);
-//
-////            TokenInfo tokenInfo = createLoginToken(username, userFullName);
-//
-//            return userFullName;
-//        } else {
-//            throw new BadCredentialsException("Authentication failed");
-//        }
-//        com.example.roomreservation.model.user.User userDetails = (User) authentication.getPrincipal();
-//
-//        // Update the security context
-//        SecurityContextHolder.getContext().setAuthentication(authentication);
-//
-//        // Create login token
-//        TokenInfo tokenInfo = createLoginToken(username, userDetails.getId());
-
-        // Return JWTResponseDTO
-        return "ads";
+        return JWTResponseDTO.builder()
+                .accessToken(tokenInfo.getAccessToken())
+                .refreshToken(tokenInfo.getRefreshToken())
+                .build();
     }
 
 
 
-    public TokenInfo createLoginToken(String username, Long userId) {
+
+
+
+    public TokenInfo createLoginToken(String username, String email) {
         String userAgent = httpRequest.getHeader(HttpHeaders.USER_AGENT);
         InetAddress ip = null;
         try {
@@ -202,7 +172,7 @@ private static String getUserInfo(String userName, LdapContext ctx, SearchContro
         log.info("Refresh token created. [tokenId={}]", accessTokenId);
 
         TokenInfo tokenInfo = new TokenInfo(accessToken, refreshToken);
-        tokenInfo.setUser(new com.example.roomreservation.model.user.User(userId));
+        tokenInfo.setUser(new com.example.roomreservation.model.user.User(username,email));
         tokenInfo.setUserAgentText(userAgent);
         tokenInfo.setLocalIpAddress(ip.getHostAddress());
         tokenInfo.setRemoteIpAddress(httpRequest.getRemoteAddr());

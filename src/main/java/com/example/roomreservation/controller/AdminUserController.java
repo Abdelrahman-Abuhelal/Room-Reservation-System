@@ -30,11 +30,11 @@ public class AdminUserController {
 //    }
 
     //get All admin users
-    @GetMapping
-    public ResponseEntity<List<User>> getAllAdmins(){
-        List<User> userList= userService.getAllAdmins();
-        return new ResponseEntity<>(userList, HttpStatus.OK);
-    }
+//    @GetMapping
+//    public ResponseEntity<List<User>> getAllAdmins(){
+//        List<User> userList= userService.getAllAdmins();
+//        return new ResponseEntity<>(userList, HttpStatus.OK);
+//    }
 
 
 

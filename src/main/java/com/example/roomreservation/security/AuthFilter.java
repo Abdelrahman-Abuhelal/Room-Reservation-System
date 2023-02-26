@@ -42,10 +42,10 @@ public class AuthFilter extends OncePerRequestFilter {
             if (tokenUtil.validateToken(jwtToken, request)) {
                 String username = tokenUtil.getUserNameFromToken(jwtToken);
                 if (username != null) {
-                    com.example.roomreservation.model.user.User userDetails = (User) userService.loadUserByUsername(username);
+                    com.example.roomreservation.model.user.User userDetails =  userService.findByUsername(username);
                     if (tokenUtil.isTokenValid(jwtToken, userDetails)) {
                         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                                userDetails, null, userDetails.getAuthorities());
+                                userDetails, null);
                         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                     }

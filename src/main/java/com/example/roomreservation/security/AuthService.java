@@ -81,7 +81,7 @@ public class AuthService {
 //                .refreshToken(tokenInfo.getRefreshToken())
 //                .build();
 //    }
-private static String getUserInfo(String userName, LdapContext ctx, SearchControls searchControls) {
+private static String getUsername(String userName, LdapContext ctx, SearchControls searchControls) {
     System.out.println("*** " + userName + " ***");
     User user = null;
     try {
@@ -99,7 +99,31 @@ private static String getUserInfo(String userName, LdapContext ctx, SearchContro
     }
     return  "";
 }
-
+    private static String getMail(String userName, LdapContext ctx, SearchControls searchControls) {
+        System.out.println("*** " + userName + " ***");
+        User user = null;
+        try {
+            NamingEnumeration<SearchResult> answer = ctx.search("dc=lab,dc=local", "sAMAccountName=" + userName, searchControls);
+            if (answer.hasMore()) {
+                Attributes attrs = answer.next().getAttributes();
+                Attribute mailAttr = attrs.get("mail");
+                if (mailAttr != null) {
+                    return mailAttr.get().toString();
+                } else {
+                    String message = "The user does not have a mail attribute";
+                    log.info(message);
+                    throw new UserNotFoundException(message);
+                }
+            } else {
+                String message = "The user is not found";
+                log.info(message);
+                throw new UserNotFoundException(message);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return "";
+    }
     private static LdapContext getLdapContext() {
         LdapContext ctx = null;
         try {
@@ -134,14 +158,16 @@ private static String getUserInfo(String userName, LdapContext ctx, SearchContro
         LdapContext ldapContext = getLdapContext();
 
         SearchControls searchControls = getSearchControls();
-        String distinguishedName = getUserInfo(userName, ldapContext, searchControls);
+        String distinguishedName = getUsername(userName, ldapContext, searchControls);
+        String mail=getMail(userName,ldapContext,searchControls);
         env.put(Context.SECURITY_PRINCIPAL, distinguishedName);
         env.put(Context.SECURITY_CREDENTIALS,password);
         DirContext userContext = new InitialDirContext(env);
         Attributes userAttributes = userContext.getAttributes(distinguishedName);
-        String username = userAttributes.get("sAMAccountName").get().toString();
-        String email = userAttributes.get("mail").get().toString();
-        TokenInfo tokenInfo = createLoginToken(username, email);
+//        String username = userAttributes.get("sAMAccountName").get().toString();
+//        String email = userAttributes.get("mail").get().toString();
+
+        TokenInfo tokenInfo = createLoginToken(distinguishedName, mail);
 
         return JWTResponseDTO.builder()
                 .accessToken(tokenInfo.getAccessToken())

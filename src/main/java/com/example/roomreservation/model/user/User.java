@@ -20,76 +20,34 @@ import java.util.Collections;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class User implements UserDetails {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class User {
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
+
 
     @Column(name = "username")
     @NotBlank
-    @Size(max = 50)
+    @Id
     private String username;
+
+
 
     @Column(name = "email")
     @NotBlank
     @Size(max = 50)
     private String email;
 
-    @NotBlank
-    @Size(max = 50)
-    @Column(name = "password")
-    private String password;
     @Column(name = "locked")
     private Boolean locked = false;
+
     @Column(name = "enabled")
     private Boolean enabled = true;
 
-    public User(Long id) {
-        this.id = id;
-    }
+
     public User(String username,String email) {
         this.username = username;
+        this.email=email;
     }
 
-    public User(String username, String password, Role role) {
-        this.username = username;
-        this.password = password;
-        this.role = role;
-    }
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        SimpleGrantedAuthority authority =
-                new SimpleGrantedAuthority(getRole().name());
-        return Collections.singletonList(authority);
-    }
-
-    @Override
-    public String getUsername() {
-        return username;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return !locked;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return enabled;
-    }
 
 }

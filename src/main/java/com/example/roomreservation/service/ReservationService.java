@@ -40,7 +40,7 @@ public class ReservationService {
 
     public Reservation createReservation(ReservationDTO reservation){
         Room reservedRoom=roomService.getRoomById(reservation.getRoom().getId());
-        User user=userService.getUserById(reservation.getOwner().getId());
+        User user=userService.findByUsername(reservation.getOwner().getUsername());
         LocalDateTime startTime=reservation.getStartTime();
         LocalDateTime endTime=reservation.getEndTime();
         if (startTime.isAfter(endTime)){

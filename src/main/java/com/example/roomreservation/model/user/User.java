@@ -18,29 +18,21 @@ import java.util.Collections;
 @Table
 @Data
 @ToString
-@AllArgsConstructor
 @NoArgsConstructor
 public class User {
 
 
 
-    @Column(name = "username")
     @NotBlank
     @Id
     private String username;
 
 
 
-    @Column(name = "email")
     @NotBlank
     @Size(max = 50)
     private String email;
 
-    @Column(name = "locked")
-    private Boolean locked = false;
-
-    @Column(name = "enabled")
-    private Boolean enabled = true;
 
 
     public User(String username,String email) {

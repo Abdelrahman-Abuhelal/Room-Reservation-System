@@ -38,11 +38,13 @@ import javax.naming.directory.*;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 
+import static com.example.roomreservation.security.LDAPServiceImpl.*;
+
 @Service
 @Log4j2
 @RequiredArgsConstructor
 public class AuthService {
-    static Hashtable<String, String> env;
+    private static Hashtable<String, String> env;
 
     private final AuthenticationManager authManager;
     private final HttpServletRequest httpRequest;
@@ -81,50 +83,41 @@ public class AuthService {
 //                .refreshToken(tokenInfo.getRefreshToken())
 //                .build();
 //    }
-private static String getUsername(String userName, LdapContext ctx, SearchControls searchControls) {
-    System.out.println("*** " + userName + " ***");
-    User user = null;
-    try {
-        NamingEnumeration<SearchResult> answer = ctx.search("dc=lab,dc=local", "sAMAccountName=" + userName, searchControls);
-        if (answer.hasMore()) {
-            Attributes attrs = answer.next().getAttributes();
-            return String.valueOf(attrs.get("distinguishedName")).split(":")[1];
-        } else {
-            String message="The user is not found";
-            log.info(message);
-           throw new UserNotFoundException(message);
-        }
-    } catch (Exception ex) {
-        ex.printStackTrace();
-    }
-    return  "";
-}
-    private static String getMail(String userName, LdapContext ctx, SearchControls searchControls) {
+
+
+    private  static String getUsername(String userName, LdapContext ctx, SearchControls searchControls) {
         System.out.println("*** " + userName + " ***");
         User user = null;
         try {
             NamingEnumeration<SearchResult> answer = ctx.search("dc=lab,dc=local", "sAMAccountName=" + userName, searchControls);
             if (answer.hasMore()) {
                 Attributes attrs = answer.next().getAttributes();
-                Attribute mailAttr = attrs.get("mail");
-                if (mailAttr != null) {
-                    return mailAttr.get().toString();
-                } else {
-                    String message = "The user does not have a mail attribute";
-                    log.info(message);
-                    throw new UserNotFoundException(message);
-                }
+                return String.valueOf(attrs.get("distinguishedName")).split(":")[1];
             } else {
-                String message = "The user is not found";
-                log.info(message);
-                throw new UserNotFoundException(message);
+                System.out.println("user not found.");
             }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        return "";
+        return  "";
     }
-    private static LdapContext getLdapContext() {
+    private  static String getMail(String userName, LdapContext ctx, SearchControls searchControls) {
+        System.out.println("*** " + userName + " ***");
+        User user = null;
+        try {
+            NamingEnumeration<SearchResult> answer = ctx.search("dc=lab,dc=local", "sAMAccountName=" + userName, searchControls);
+            if (answer.hasMore()) {
+                Attributes attrs = answer.next().getAttributes();
+                return String.valueOf(attrs.get("mail"));
+            } else {
+                System.out.println("user not found.");
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return  "";
+    }
+    private LdapContext getLdapContext() throws javax.naming.NamingException {
         LdapContext ctx = null;
         try {
             env = new Hashtable<String, String>();
@@ -140,14 +133,14 @@ private static String getUsername(String userName, LdapContext ctx, SearchContro
 
             ctx = new InitialLdapContext(env, null);
             System.out.println("LDAP Connection: COMPLETE");
-        } catch (NamingException | javax.naming.NamingException nex) {
+        } catch (NamingException nex) {
             System.out.println("LDAP Connection: FAILED");
             nex.printStackTrace();
         }
         return ctx;
     }
 
-    private static SearchControls getSearchControls() {
+    private SearchControls getSearchControls() {
         SearchControls cons = new SearchControls();
         cons.setSearchScope(SearchControls.SUBTREE_SCOPE);
         String[] attrIDs = {"distinguishedName", "sn", "givenname", "mail", "telephonenumber", "thumbnailPhoto"};
@@ -159,11 +152,11 @@ private static String getUsername(String userName, LdapContext ctx, SearchContro
 
         SearchControls searchControls = getSearchControls();
         String distinguishedName = getUsername(userName, ldapContext, searchControls);
-        String mail=getMail(userName,ldapContext,searchControls);
+        String mail= getMail(userName,ldapContext,searchControls);
         env.put(Context.SECURITY_PRINCIPAL, distinguishedName);
         env.put(Context.SECURITY_CREDENTIALS,password);
         DirContext userContext = new InitialDirContext(env);
-        Attributes userAttributes = userContext.getAttributes(distinguishedName);
+//        Attributes userAttributes = userContext.getAttributes(distinguishedName);
 //        String username = userAttributes.get("sAMAccountName").get().toString();
 //        String email = userAttributes.get("mail").get().toString();
 

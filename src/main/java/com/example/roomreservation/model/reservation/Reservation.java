@@ -1,14 +1,14 @@
 package com.example.roomreservation.model.reservation;
 
-import com.example.roomreservation.model.room.Room;
-import com.example.roomreservation.model.user.User;
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+        import com.example.roomreservation.model.room.Room;
+        import com.example.roomreservation.model.user.User;
+        import jakarta.persistence.*;
+        import lombok.AllArgsConstructor;
+        import lombok.Data;
+        import lombok.NoArgsConstructor;
+        import lombok.ToString;
 
-import java.time.LocalDateTime;
+        import java.time.LocalDateTime;
 
 @Entity
 @Table

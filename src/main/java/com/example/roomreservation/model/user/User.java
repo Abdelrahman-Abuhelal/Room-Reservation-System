@@ -21,18 +21,14 @@ import java.util.Collections;
 @NoArgsConstructor
 public class User {
 
-
-
     @NotBlank
     @Id
+    @Column(length = 100)
     private String username;
-
-
 
     @NotBlank
     @Size(max = 50)
     private String email;
-
 
 
     public User(String username,String email) {

@@ -11,6 +11,7 @@ import com.example.roomreservation.exception.user.UserNotFoundException;
 import com.example.roomreservation.model.token.TokenInfo;
 import com.example.roomreservation.model.user.User;
 import com.example.roomreservation.service.TokenInfoService;
+import com.example.roomreservation.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -47,6 +48,7 @@ public class AuthService {
     private static Hashtable<String, String> env;
 
     private final AuthenticationManager authManager;
+    private final UserService userService;
     private final HttpServletRequest httpRequest;
 
     private final TokenInfoService tokenInfoService;
@@ -54,11 +56,12 @@ public class AuthService {
     private final JwtTokenUtils jwtTokenUtils;
 
     @Autowired
-    public AuthService(AuthenticationManager authManager,TokenInfoService tokenInfoService, JwtTokenUtils jwtTokenUtils, HttpServletRequest httpRequest) {
+    public AuthService(AuthenticationManager authManager,TokenInfoService tokenInfoService, JwtTokenUtils jwtTokenUtils, HttpServletRequest httpRequest,UserService userService) {
         this.authManager = authManager;
         this.tokenInfoService = tokenInfoService;
         this.jwtTokenUtils = jwtTokenUtils;
         this.httpRequest = httpRequest;
+        this.userService=userService;
     }
 
 //    public JWTResponseDTO login(String username, String password) {
@@ -89,7 +92,7 @@ public class AuthService {
         System.out.println("*** " + userName + " ***");
         User user = null;
         try {
-            NamingEnumeration<SearchResult> answer = ctx.search("dc=lab,dc=local", "sAMAccountName=" + userName, searchControls);
+            NamingEnumeration<SearchResult> answer = ctx.search("dc=lab,dc=local", "(&(objectClass=user)(sAMAccountName=" + userName + "))", searchControls);
             if (answer.hasMore()) {
                 Attributes attrs = answer.next().getAttributes();
                 return String.valueOf(attrs.get("distinguishedName")).split(":")[1];
@@ -105,12 +108,29 @@ public class AuthService {
         System.out.println("*** " + userName + " ***");
         User user = null;
         try {
-            NamingEnumeration<SearchResult> answer = ctx.search("dc=lab,dc=local", "sAMAccountName=" + userName, searchControls);
+            NamingEnumeration<SearchResult> answer = ctx.search("DC=lab,DC=local", "(&(objectClass=user)(sAMAccountName=" + userName + "))", searchControls);
             if (answer.hasMore()) {
                 Attributes attrs = answer.next().getAttributes();
                 return String.valueOf(attrs.get("mail"));
             } else {
-                System.out.println("user not found.");
+                System.out.println("email not found.");
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return  "";
+    }
+
+    private  static String getsAMAccountName(String userName, LdapContext ctx, SearchControls searchControls) {
+        System.out.println("*** " + userName + " ***");
+        User user = null;
+        try {
+            NamingEnumeration<SearchResult> answer = ctx.search("DC=lab,DC=local", "(&(objectClass=user)(sAMAccountName=" + userName + "))", searchControls);
+            if (answer.hasMore()) {
+                Attributes attrs = answer.next().getAttributes();
+                return String.valueOf(attrs.get("sAMAccountName")).split(":")[1];
+            } else {
+                System.out.println("email not found.");
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -143,7 +163,7 @@ public class AuthService {
     private SearchControls getSearchControls() {
         SearchControls cons = new SearchControls();
         cons.setSearchScope(SearchControls.SUBTREE_SCOPE);
-        String[] attrIDs = {"distinguishedName", "sn", "givenname", "mail", "telephonenumber", "thumbnailPhoto"};
+        String[] attrIDs = {"distinguishedName", "sn", "givenname", "mail", "telephonenumber", "thumbnailPhoto","sAMAccountName"};
         cons.setReturningAttributes(attrIDs);
         return cons;
     }
@@ -151,16 +171,16 @@ public class AuthService {
         LdapContext ldapContext = getLdapContext();
 
         SearchControls searchControls = getSearchControls();
+        // DistinguishedName is something like CN=test test ,CN=users,DC=lab,DC=local
         String distinguishedName = getUsername(userName, ldapContext, searchControls);
         String mail= getMail(userName,ldapContext,searchControls);
+        //for SECURITY_PRINCIPAL you should provide the DistinguishedName
         env.put(Context.SECURITY_PRINCIPAL, distinguishedName);
         env.put(Context.SECURITY_CREDENTIALS,password);
+        // this will search for sMAccountName which is the small name like test for the previous example
+        String sAMAccountName=getsAMAccountName(userName, ldapContext, searchControls);
         DirContext userContext = new InitialDirContext(env);
-//        Attributes userAttributes = userContext.getAttributes(distinguishedName);
-//        String username = userAttributes.get("sAMAccountName").get().toString();
-//        String email = userAttributes.get("mail").get().toString();
-
-        TokenInfo tokenInfo = createLoginToken(distinguishedName, mail);
+        TokenInfo tokenInfo = createLoginToken(sAMAccountName, mail);
 
         return JWTResponseDTO.builder()
                 .accessToken(tokenInfo.getAccessToken())
@@ -179,7 +199,6 @@ public class AuthService {
         try {
             ip = InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         String accessTokenId = UUID.randomUUID().toString();
@@ -191,7 +210,17 @@ public class AuthService {
         log.info("Refresh token created. [tokenId={}]", accessTokenId);
 
         TokenInfo tokenInfo = new TokenInfo(accessToken, refreshToken);
-        tokenInfo.setUser(new com.example.roomreservation.model.user.User(username,email));
+        if (!userService.isPresentUsername(username)){
+            //if the user hasn't signed in before
+            tokenInfo.setUser(new com.example.roomreservation.model.user.User(username,email));
+        }else
+        {
+            // if the user has signed in before
+        User user=userService.findByUsername(username);
+        user.setUsername(username);
+        user.setEmail(email);
+        tokenInfo.setUser(user);
+        }
         tokenInfo.setUserAgentText(userAgent);
         tokenInfo.setLocalIpAddress(ip.getHostAddress());
         tokenInfo.setRemoteIpAddress(httpRequest.getRemoteAddr());

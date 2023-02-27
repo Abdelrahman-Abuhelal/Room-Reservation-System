@@ -63,6 +63,13 @@ public class UserService  {
         }return myuser.get();
     }
 
+    public Boolean isPresentUsername(String username) {
+        Optional<User> myuser = userRepository.findByUsername(username);
+        if (!myuser.isPresent()){
+           return false;
+        }return true;
+    }
+
 //    @Override
 //    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 //        User user = userRepository.findByUsername(username)

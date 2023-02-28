@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -40,7 +41,7 @@ public class ReservationController {
 
     // reserve a room
     @PostMapping
-    public ResponseEntity<Reservation> createReservation(@RequestBody ReservationDTO reservation){
+    public ResponseEntity<Reservation> createReservation(@RequestBody @Valid ReservationDTO reservation){
         Reservation createdReservation= reservationService.createReservation(reservation);
         return new ResponseEntity<>(createdReservation, HttpStatus.CREATED);
     }
@@ -48,7 +49,7 @@ public class ReservationController {
 
     // update one reservation with new data
     @PutMapping("/{id}")
-    public ResponseEntity<Reservation> updateReservation(@PathVariable Long id,@RequestBody ReservationDTO reservation){
+    public ResponseEntity<Reservation> updateReservation(@PathVariable Long id,@RequestBody @Valid  ReservationDTO reservation){
        Reservation updatedReservation= reservationService.updateReservation(id,reservation);
         return new ResponseEntity<>(updatedReservation, HttpStatus.OK);
     }

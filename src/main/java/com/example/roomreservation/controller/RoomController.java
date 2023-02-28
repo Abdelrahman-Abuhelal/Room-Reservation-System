@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -41,7 +43,7 @@ public class RoomController {
 
     //getting a list of available rooms by a specific time
     @GetMapping("/available")
-    public ResponseEntity<List<Room>>getAllAvailableRooms(@RequestBody ReservationTime reservationTime){
+    public ResponseEntity<List<Room>>getAllAvailableRooms(@RequestBody @Valid ReservationTime reservationTime){
         List<Room> availableRooms=roomService.getAllAvailableRooms(reservationTime);
         return ResponseEntity.ok(availableRooms);
     }
@@ -49,7 +51,8 @@ public class RoomController {
 
     //getting all available room in a specified branch
     @GetMapping("/{branchName}/available")
-    public ResponseEntity<List<Room>>getAllAvailableRooms(@RequestBody ReservationTime reservationTime,@PathVariable String branchName){
+    @NotBlank
+    public ResponseEntity<List<Room>>getAllAvailableRooms(@RequestBody @Valid   ReservationTime reservationTime,@PathVariable String branchName){
         BranchName name=BranchName.valueOf(branchName.toUpperCase());
         List<Room> availableRooms=roomService.getAllAvailableRoomsByBranchName(reservationTime,name);
         return ResponseEntity.ok(availableRooms);
@@ -57,14 +60,14 @@ public class RoomController {
 
     //adding a new room
     @PostMapping
-    public ResponseEntity<Room> addRoom(@RequestBody RoomDTO room){
+    public ResponseEntity<Room> addRoom(@RequestBody @Valid  RoomDTO room){
         Room addedRoom = roomService.addRoom(room);
         return new ResponseEntity<>(addedRoom, HttpStatus.CREATED);
     }
 
     //update a specific room with a new data
     @PutMapping("/{id}")
-    public ResponseEntity<Room> updateRoom(@RequestBody RoomDTO room,@PathVariable Long id){
+    public ResponseEntity<Room> updateRoom(@RequestBody @Valid  RoomDTO room,@PathVariable Long id){
         Room updateRoom = roomService.updateRoom(room,id);
         return new ResponseEntity<>(updateRoom, HttpStatus.OK);
     }

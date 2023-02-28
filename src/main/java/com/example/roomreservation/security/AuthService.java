@@ -2,10 +2,7 @@ package com.example.roomreservation.security;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import com.example.roomreservation.exception.user.UserNotFoundException;
 import com.example.roomreservation.model.token.TokenInfo;
@@ -39,7 +36,7 @@ import javax.naming.directory.*;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 
-import static com.example.roomreservation.security.LDAPServiceImpl.*;
+//import static com.example.roomreservation.security.LDAPServiceImpl.*;
 
 @Service
 @Log4j2
@@ -47,7 +44,6 @@ import static com.example.roomreservation.security.LDAPServiceImpl.*;
 public class AuthService {
     private static Hashtable<String, String> env;
 
-    private final AuthenticationManager authManager;
     private final UserService userService;
     private final HttpServletRequest httpRequest;
 
@@ -56,8 +52,7 @@ public class AuthService {
     private final JwtTokenUtils jwtTokenUtils;
 
     @Autowired
-    public AuthService(AuthenticationManager authManager,TokenInfoService tokenInfoService, JwtTokenUtils jwtTokenUtils, HttpServletRequest httpRequest,UserService userService) {
-        this.authManager = authManager;
+    public AuthService(TokenInfoService tokenInfoService, JwtTokenUtils jwtTokenUtils, HttpServletRequest httpRequest,UserService userService) {
         this.tokenInfoService = tokenInfoService;
         this.jwtTokenUtils = jwtTokenUtils;
         this.httpRequest = httpRequest;
@@ -88,55 +83,26 @@ public class AuthService {
 //    }
 
 
-    private  static String getUsername(String userName, LdapContext ctx, SearchControls searchControls) {
+    private  static ArrayList<String> getUserData(String userName, LdapContext ctx, SearchControls searchControls) {
+        ArrayList<String>userData=new ArrayList<>();
         System.out.println("*** " + userName + " ***");
         User user = null;
         try {
             NamingEnumeration<SearchResult> answer = ctx.search("dc=lab,dc=local", "(&(objectClass=user)(sAMAccountName=" + userName + "))", searchControls);
             if (answer.hasMore()) {
                 Attributes attrs = answer.next().getAttributes();
-                return String.valueOf(attrs.get("distinguishedName")).split(":")[1];
+                 userData.add(String.valueOf(attrs.get("distinguishedName")).split(":")[1].substring(1));
+                 userData.add(String.valueOf(attrs.get("mail")).split(":")[1].substring(1));
+                 userData.add(String.valueOf(attrs.get("sAMAccountName")).split(":")[1].substring(1));
             } else {
                 System.out.println("user not found.");
             }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        return  "";
-    }
-    private  static String getMail(String userName, LdapContext ctx, SearchControls searchControls) {
-        System.out.println("*** " + userName + " ***");
-        User user = null;
-        try {
-            NamingEnumeration<SearchResult> answer = ctx.search("DC=lab,DC=local", "(&(objectClass=user)(sAMAccountName=" + userName + "))", searchControls);
-            if (answer.hasMore()) {
-                Attributes attrs = answer.next().getAttributes();
-                return String.valueOf(attrs.get("mail"));
-            } else {
-                System.out.println("email not found.");
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return  "";
+        return  userData;
     }
 
-    private  static String getsAMAccountName(String userName, LdapContext ctx, SearchControls searchControls) {
-        System.out.println("*** " + userName + " ***");
-        User user = null;
-        try {
-            NamingEnumeration<SearchResult> answer = ctx.search("DC=lab,DC=local", "(&(objectClass=user)(sAMAccountName=" + userName + "))", searchControls);
-            if (answer.hasMore()) {
-                Attributes attrs = answer.next().getAttributes();
-                return String.valueOf(attrs.get("sAMAccountName")).split(":")[1];
-            } else {
-                System.out.println("email not found.");
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return  "";
-    }
     private LdapContext getLdapContext() throws javax.naming.NamingException {
         LdapContext ctx = null;
         try {
@@ -172,15 +138,15 @@ public class AuthService {
 
         SearchControls searchControls = getSearchControls();
         // DistinguishedName is something like CN=test test ,CN=users,DC=lab,DC=local
-        String distinguishedName = getUsername(userName, ldapContext, searchControls);
-        String mail= getMail(userName,ldapContext,searchControls);
+        ArrayList <String>userData = getUserData(userName, ldapContext, searchControls);
+//        String mail= getMail(userName,ldapContext,searchControls);
         //for SECURITY_PRINCIPAL you should provide the DistinguishedName
-        env.put(Context.SECURITY_PRINCIPAL, distinguishedName);
+        env.put(Context.SECURITY_PRINCIPAL, userData.get(0));
         env.put(Context.SECURITY_CREDENTIALS,password);
         // this will search for sMAccountName which is the small name like test for the previous example
-        String sAMAccountName=getsAMAccountName(userName, ldapContext, searchControls);
+        //String sAMAccountName=getsAMAccountName(userName, ldapContext, searchControls);
         DirContext userContext = new InitialDirContext(env);
-        TokenInfo tokenInfo = createLoginToken(sAMAccountName, mail);
+        TokenInfo tokenInfo = createLoginToken(userData.get(2), userData.get(1));
 
         return JWTResponseDTO.builder()
                 .accessToken(tokenInfo.getAccessToken())

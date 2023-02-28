@@ -8,6 +8,7 @@ package com.example.roomreservation.model.reservation;
         import lombok.NoArgsConstructor;
         import lombok.ToString;
 
+        import javax.validation.constraints.NotBlank;
         import java.time.LocalDateTime;
 
 @Entity
@@ -24,15 +25,19 @@ public class Reservation {
     private String reservationDescription;
 
     @ManyToOne
+    @NotBlank
     private Room room;
 
     @ManyToOne
+    @NotBlank
     private User owner;
 
     @Column(name = "start_time")
+    @NotBlank
     private LocalDateTime startTime;
 
     @Column(name = "end_time")
+    @NotBlank
     private LocalDateTime endTime;
 
 

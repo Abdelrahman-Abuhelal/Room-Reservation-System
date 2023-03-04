@@ -27,6 +27,8 @@ public class SecurityConfig {
 
 
     private String[] PUBLIC_END_POINTS={"/api/v1/auth/login", "/api/v1/auth/refresh-token", "/api/v1/auth/logout"};
+
+    private String[] AUTH_END_POINTS={"/api/v1/branches","/api/v1/users","/api/v1/reservations","/api/v1/rooms"};
     @Autowired
     private JwtUnAuthResponse jwtUnAuthResponse;
 

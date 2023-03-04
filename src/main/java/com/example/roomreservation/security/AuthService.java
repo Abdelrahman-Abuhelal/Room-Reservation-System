@@ -49,10 +49,13 @@ public class AuthService {
 
     private final TokenInfoService tokenInfoService;
 
+    private final AuthenticationManager authenticationManager;
+
     private final JwtTokenUtils jwtTokenUtils;
 
     @Autowired
-    public AuthService(TokenInfoService tokenInfoService, JwtTokenUtils jwtTokenUtils, HttpServletRequest httpRequest,UserService userService) {
+    public AuthService( AuthenticationManager authenticationManager,TokenInfoService tokenInfoService, JwtTokenUtils jwtTokenUtils, HttpServletRequest httpRequest,UserService userService) {
+        this.authenticationManager=authenticationManager;
         this.tokenInfoService = tokenInfoService;
         this.jwtTokenUtils = jwtTokenUtils;
         this.httpRequest = httpRequest;
@@ -134,19 +137,19 @@ public class AuthService {
         return cons;
     }
     public JWTResponseDTO login(String userName, String password) throws javax.naming.NamingException {
-        LdapContext ldapContext = getLdapContext();
-
-        SearchControls searchControls = getSearchControls();
-        // DistinguishedName is something like CN=test test ,CN=users,DC=lab,DC=local
-        ArrayList <String>userData = getUserData(userName, ldapContext, searchControls);
-//        String mail= getMail(userName,ldapContext,searchControls);
-        //for SECURITY_PRINCIPAL you should provide the DistinguishedName
-        env.put(Context.SECURITY_PRINCIPAL, userData.get(0));
-        env.put(Context.SECURITY_CREDENTIALS,password);
-        // this will search for sMAccountName which is the small name like test for the previous example
-        //String sAMAccountName=getsAMAccountName(userName, ldapContext, searchControls);
-        DirContext userContext = new InitialDirContext(env);
-        TokenInfo tokenInfo = createLoginToken(userData.get(2), userData.get(1));
+//        LdapContext ldapContext = getLdapContext();
+//
+//        SearchControls searchControls = getSearchControls();
+//        // DistinguishedName is something like 'CN=test test ,CN=users,DC=lab,DC=local'
+//        ArrayList <String>userData = getUserData(userName, ldapContext, searchControls);
+////        String mail= getMail(userName,ldapContext,searchControls);
+//        //for SECURITY_PRINCIPAL you should provide the DistinguishedName
+//        env.put(Context.SECURITY_PRINCIPAL, userData.get(0));
+//        env.put(Context.SECURITY_CREDENTIALS,password);
+//        // this will search for sMAccountName which is a small name like 'test' for the previous example
+//        //String sAMAccountName=getsAMAccountName(userName, ldapContext, searchControls);
+//        DirContext userContext = new InitialDirContext(env);
+        TokenInfo tokenInfo = createLoginToken("userData.get(2)", "userData.get(1)");
 
         return JWTResponseDTO.builder()
                 .accessToken(tokenInfo.getAccessToken())

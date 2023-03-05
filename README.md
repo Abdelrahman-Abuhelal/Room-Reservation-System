@@ -22,7 +22,7 @@ Open a terminal window and navigate to the directory where you want to clone the
 
 Type the following command to clone the repository:
 
-git clone https://github.com/Abdelrahman-Abuhelal/room-reservation-system.git
+```git clone https://github.com/Abdelrahman-Abuhelal/room-reservation-system.git```
 
 
 
@@ -44,6 +44,8 @@ You should add spring-boot-maven-plugin artifact to your pom.xml with the config
 
 ● You can use this GitHub documentation https://github.com/winsw/winsw to download the WinSW.NET4.exe and sample-minimal.xml.
 
+- YouTube Step By Step for installing the application as a windows service: https://www.youtube.com/watch?v=OOVE_g6F8mQ
+
 ● Put the JAR file, WinSW executable and config in the same folder.
 
 ● Edit the sample-minimal.xml name to WinSW.NET4.xml.
@@ -59,4 +61,3 @@ You should add spring-boot-maven-plugin artifact to your pom.xml with the config
 ● Open the local Services, and run the service.
 
 
-● YouTube Step By Step for installing the application as a windows service: https://www.youtube.com/watch?v=OOVE_g6F8mQ

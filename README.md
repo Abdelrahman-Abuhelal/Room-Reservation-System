@@ -24,6 +24,21 @@ Type the following command to clone the repository:
 
 ```git clone https://github.com/Abdelrahman-Abuhelal/room-reservation-system.git```
 
+## Importing the Project
+
+After cloning the repository, you can import the project into your IDE. Here's how to do it in IntelliJ:
+
+1. Open IntelliJ and select "Import Project" from the welcome screen.
+
+2. Navigate to the directory where you cloned the repository and select the pom.xml file.
+
+3. Click "Open" and select "Import Maven Projects".
+
+4. Select the checkbox next to the project and click "Next".
+
+5. Leave the default options and click "Next" again.
+
+6. Click "Finish" to import the project.
 
 
 # Deploy the application:

@@ -43,8 +43,12 @@ You should add spring-boot-maven-plugin artifact to your pom.xml with the config
 ● WinSW-xxx.xml file needs to be configured correctly.
 
 ● Open the cmd Run as Administrator.
+
 ● Go to the Folder directory
+
 ● Enter the command “WinSW.NET4.exe install”
+
 ● Open the local Services, and run the service.
+
 
 ● YouTube Step By Step for installing the application as a windows service: https://www.youtube.com/watch?v=OOVE_g6F8mQ

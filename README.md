@@ -1,20 +1,20 @@
 # room-reservation-system
 
-How to Start a Spring Boot Project:
-
+# How to Start a Spring Boot Project:
+ 
 This guide will walk you through the steps to start a new Spring Boot project using the command line.
 
-Prerequisites:
+## Prerequisites:
 
 Before you begin, you will need to have the following installed on your computer:
 
-Java Development Kit (JDK) version 17 
+** Java Development Kit (JDK) version 17 
 
-Maven build tool
+** Maven build tool
 
-An IDE (such as IntelliJ or Eclipse)
+** An IDE (such as IntelliJ or Eclipse)
 
-Cloning the Repository:
+## Cloning the Repository:
 
 To get started, you'll need to clone the repository to your local machine. Here are the steps:
 
@@ -26,13 +26,13 @@ git clone https://github.com/Abdelrahman-Abuhelal/room-reservation-system.git
 
 
 
-Deploy the application:
+# Deploy the application:
 
-Environment:
+● Environment:
 Use the 192.168.200.150 Computer In Remote Desktop.
 Get the credentials from IT Administrator.
 
-Maven Configuration: JAR packaging
+● Maven Configuration: JAR packaging
 You should add spring-boot-maven-plugin artifact to your pom.xml with the configuration and executable tags like below:
 
 

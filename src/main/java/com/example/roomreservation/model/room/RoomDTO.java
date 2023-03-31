@@ -18,5 +18,7 @@ public class RoomDTO {
 
     private Integer capacity;
 
+    public RoomDTO(){
 
+    }
 }

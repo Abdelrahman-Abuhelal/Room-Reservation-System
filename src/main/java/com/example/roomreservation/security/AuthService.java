@@ -137,19 +137,21 @@ public class AuthService {
         return cons;
     }
     public JWTResponseDTO login(String userName, String password) throws javax.naming.NamingException {
-//        LdapContext ldapContext = getLdapContext();
-//
-//        SearchControls searchControls = getSearchControls();
-//        // DistinguishedName is something like 'CN=test test ,CN=users,DC=lab,DC=local'
-//        ArrayList <String>userData = getUserData(userName, ldapContext, searchControls);
-////        String mail= getMail(userName,ldapContext,searchControls);
-//        //for SECURITY_PRINCIPAL you should provide the DistinguishedName
-//        env.put(Context.SECURITY_PRINCIPAL, userData.get(0));
-//        env.put(Context.SECURITY_CREDENTIALS,password);
-//        // this will search for sMAccountName which is a small name like 'test' for the previous example
-//        //String sAMAccountName=getsAMAccountName(userName, ldapContext, searchControls);
-//        DirContext userContext = new InitialDirContext(env);
-        TokenInfo tokenInfo = createLoginToken("userData.get(2)", "userData.get(1)");
+        LdapContext ldapContext = getLdapContext();
+
+        SearchControls searchControls = getSearchControls();
+        // DistinguishedName is something like 'CN=test test ,CN=users,DC=lab,DC=local'
+        ArrayList <String>userData = getUserData(userName, ldapContext, searchControls);
+//        String mail= getMail(userName,ldapContext,searchControls);
+        //for SECURITY_PRINCIPAL you should provide the DistinguishedName
+        env.put(Context.SECURITY_PRINCIPAL, userData.get(0));
+        env.put(Context.SECURITY_CREDENTIALS,password);
+        // this will search for sMAccountName which is a small name like 'test' for the previous example
+        //String sAMAccountName=getsAMAccountName(userName, ldapContext, searchControls);
+        DirContext userContext = new InitialDirContext(env);
+        String email=userData.get(1);
+        String username=userData.get(2);
+        TokenInfo tokenInfo = createLoginToken(username,email);
 
         return JWTResponseDTO.builder()
                 .accessToken(tokenInfo.getAccessToken())

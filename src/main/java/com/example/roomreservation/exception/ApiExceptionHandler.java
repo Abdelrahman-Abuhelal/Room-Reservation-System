@@ -31,6 +31,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<String> handleRoomNotFoundException(RoomNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
+
     @ExceptionHandler(ReservationNotFoundException.class)
     public ResponseEntity<String> handleReservationNotFoundException(ReservationNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());

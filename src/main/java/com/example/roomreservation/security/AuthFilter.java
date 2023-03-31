@@ -36,19 +36,15 @@ public class AuthFilter extends OncePerRequestFilter {
         final String jwtTokenHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         log.info("Path is >> " + request.getRequestURL());
-        log.info(jwtTokenHeader+" dsaaaaaaaaaaaaaaa");
         final SecurityContext securityContext = SecurityContextHolder.getContext();
 
         if (jwtTokenHeader != null && securityContext.getAuthentication() == null) {
             String jwtToken = jwtTokenHeader.substring("Bearer ".length());
             if (tokenUtil.validateToken(jwtToken, request)) {
                 String username = tokenUtil.getUserNameFromToken(jwtToken);
-                log.info(username+" 555555555555555555");
                 if (username != null) {
                     com.example.roomreservation.model.user.User userDetails =  userService.findByUsername(username);
-                    log.info(userDetails.getUsername()+" 6666666666666666666666");
                     if (tokenUtil.isTokenValid(jwtToken, userDetails)) {
-                        log.info(userDetails.getUsername()+" 6666666666666666666666");
                         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                                 userDetails, null,null);
                         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

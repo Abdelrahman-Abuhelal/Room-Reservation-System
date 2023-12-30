@@ -1,6 +1,6 @@
 # Room Reservation System 
 
-# How to Start a Spring Boot Project:
+# How to Start the Project:
  
 This guide will walk you through the steps to start the project using the command line.
 

@@ -2,7 +2,7 @@
 
 # How to Start a Spring Boot Project:
  
-This guide will walk you through the steps to start a new Spring Boot project using the command line.
+This guide will walk you through the steps to start the project using the command line.
 
 ## Prerequisites:
 

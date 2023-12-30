@@ -1,4 +1,5 @@
 # Room Reservation System 
+It is an application developed by me, to handle the users (employees in the company) to reserve the rooms inside the company.
 
 # How to Start the Project:
  

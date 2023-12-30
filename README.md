@@ -1,5 +1,20 @@
 # Room Reservation System 
-It is an application developed by me, to handle the users (employees in the company) to reserve the rooms inside the company.
+It is an internal project developed by me, manages meeting room reservations across multiple branches within the company. 
+
+## Key Features:
+
+1- Multi-branch Support: Seamlessly handles reservations across various company branches.
+
+2- User Authentication: Securely manages user access with authentication and authorization functionalities.
+
+3- Real-time Availability: Provides live updates on room availability and schedules.
+
+4- Reservation Management: Allows users to create, update, and cancel reservations.
+
+5- Exception Handling: Includes robust exception handling mechanisms to manage and gracefully handle errors and exceptions throughout the application.
+
+6- Unit Testing: Incorporates unit tests for critical components ensuring reliability and correctness.
+
 
 # How to Start the Project:
  

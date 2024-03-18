@@ -16,6 +16,28 @@ It is an internal project developed by me, manages meeting room reservations acr
 6- Unit Testing: Incorporates unit tests for critical components ensuring reliability and correctness.
 
 
+## Backend APIs
+
+### Room APIs:
+![image](https://github.com/Abdelrahman-Abuhelal/room-reservation-system/assets/77440941/87015dec-a2e6-40f1-9f27-b2e9a01cd84e)
+
+### Ex:
+![image](https://github.com/Abdelrahman-Abuhelal/room-reservation-system/assets/77440941/24ba2475-15df-4331-bb0a-aebe0c22b9a1)
+
+
+### Reservation APIs:
+![image](https://github.com/Abdelrahman-Abuhelal/room-reservation-system/assets/77440941/0c551ce1-0b2c-4434-8ff0-03fbd9336cbd)
+
+### Ex:
+![image](https://github.com/Abdelrahman-Abuhelal/room-reservation-system/assets/77440941/ed56a788-b271-40cb-be84-8cd2a9fec994)
+
+### Handling Conflicts:
+![image](https://github.com/Abdelrahman-Abuhelal/room-reservation-system/assets/77440941/0c62e198-4e9a-4531-a55a-c1721f5412ac)
+
+### Branches APIs: 
+![image](https://github.com/Abdelrahman-Abuhelal/room-reservation-system/assets/77440941/fcf1a18f-24e4-4874-86db-6536378e3b39)
+
+
 # How to Start the Project:
  
 This guide will walk you through the steps to start the project using the command line.
